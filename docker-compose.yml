@@ -1,0 +1,36 @@
+version: "3.3"
+
+services:
+  database:
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: savvy_database
+    restart: always
+    environment:
+      MYSQL_DATABASE: savvy
+      MYSQL_USER: savvy
+      MYSQL_PASSWORD: savvy
+      MYSQL_ROOT_PASSWORD: savvy
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    ports:
+      - '19900:3306'
+
+  db_admin:
+    depends_on:
+      - database
+    image: phpmyadmin/phpmyadmin
+    container_name: savvy_phpmyadmin
+    restart: always
+    links:
+      - database
+    ports:
+      - '15089:80'
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=database
+      - PMA_PORT=3306
+
+volumes:
+  database:
